@@ -582,7 +582,11 @@ void setWriteTime(const fs::path & p, const struct stat & st)
         .tv_sec = st.st_mtime,
         .tv_usec = 0,
     };
+#if HAVE_LUTIMES
     if (lutimes(p.c_str(), times) != 0)
+#else
+    if (!S_ISLNK(st.st_mode) && utimes(p.c_str(), times) != 0)
+#endif
         throw SysError("changing modification time of '%s'", p);
 }
 

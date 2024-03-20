@@ -47,7 +47,11 @@ bool touchCacheFile(const Path & path, time_t touch_time)
     times[1].tv_sec = touch_time;
     times[1].tv_usec = 0;
 
+#if HAVE_LUTIMES
     return lutimes(path.c_str(), times) == 0;
+#else
+    return utimes(p.c_str(), times) == 0;
+#endif
 }
 
 Path getCachePath(std::string_view key, bool shallow)
